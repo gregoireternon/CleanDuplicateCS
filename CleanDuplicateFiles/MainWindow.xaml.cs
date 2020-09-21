@@ -43,7 +43,7 @@ namespace CleanDuplicateFiles
 
         private void ComputeRefHashes_Click(object sender, RoutedEventArgs e)
         {
-            ComputeRefHashes.IsEnabled = false;
+            ToggleBtnEnable(false);
             Thread t = new Thread(_processor.ProcessFolder);
             t.Start();
         }
@@ -51,7 +51,7 @@ namespace CleanDuplicateFiles
         public void RefFolderPRocessed()
         {
             Dispatcher.BeginInvoke(new Action(() => {
-                ComputeRefHashes.IsEnabled = true;
+                ToggleBtnEnable(true);
             }));
             
         }
@@ -62,6 +62,15 @@ namespace CleanDuplicateFiles
                 indexedFilesCounter.Content = "Nb de fichiers en référence: " + count;
             }));
             
+        }
+
+        private void ToggleBtnEnable(bool value)
+        {
+            ComputeRefHashes.IsEnabled = value;
+            ChooseToCompare.IsEnabled = value;
+            ChooseRefFolder.IsEnabled = value;
+            ComputeDuplicate.IsEnabled = value;
+            CleanDuplicate.IsEnabled = value;
         }
       
     }

@@ -13,7 +13,7 @@
         <Button x:Name="ChooseToCompare" Content="Choisir un répertoire à comparer" HorizontalAlignment="Left" Height="30" Margin="28,99,0,0" VerticalAlignment="Top" Width="244"/>
         <Button x:Name="ComputeDuplicate" Content="Calcul des doublons" HorizontalAlignment="Left" Height="28" Margin="28,151,0,0" VerticalAlignment="Top" Width="244"/>
         <Button x:Name="CleanDuplicate" Content="Nettoyer les doublons" HorizontalAlignment="Left" Height="28" Margin="287,151,0,0" VerticalAlignment="Top" Width="244"/>
-        <TextBox x:Name="ToCleanFolder" HorizontalAlignment="Left" Height="30" Margin="277,99,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="448"/>
+        <TextBox x:Name="ToCleanFolder" HorizontalAlignment="Left" Height="30" Margin="277,99,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="448" IsEnabled="False"/>
         <Label x:Name="indexedFilesCounter" Content="" HorizontalAlignment="Left" Height="30" Margin="28,216,0,0" VerticalAlignment="Top" Width="214"/>
 
     </Grid>
