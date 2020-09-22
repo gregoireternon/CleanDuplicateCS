@@ -23,6 +23,7 @@ namespace CleanDuplicateFiles
         {
             InitializeComponent();
             _processor = new Processor(this);
+            RefFolderUrl.Text = _processor.RefPath;
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -72,6 +73,28 @@ namespace CleanDuplicateFiles
             ComputeDuplicate.IsEnabled = value;
             CleanDuplicate.IsEnabled = value;
         }
-      
+
+        private void ChooseToCompare_Click(object sender, RoutedEventArgs e)
+        {
+            FolderBrowserDialog fddialog = new FolderBrowserDialog();
+            DialogResult result = fddialog.ShowDialog();
+            if (result == System.Windows.Forms.DialogResult.OK)
+            {
+                ToCleanFolder.Text = fddialog.SelectedPath;
+                _processor.ToComparePath = fddialog.SelectedPath;
+            }
+        }
+
+        private void ComputeDuplicate_Click(object sender, RoutedEventArgs e)
+        {
+            _processor.ComputeDuplicate();
+        }
+
+        public void ToCompareComptationFinished(int count)
+        {
+            Dispatcher.BeginInvoke(new Action(() => {
+                indexedFilesCounter.Content = "Nb de fichiers en référence: " + count;
+            }));
+        }
     }
 }
