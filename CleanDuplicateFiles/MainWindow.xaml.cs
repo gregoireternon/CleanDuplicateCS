@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -87,13 +83,46 @@ namespace CleanDuplicateFiles
 
         private void ComputeDuplicate_Click(object sender, RoutedEventArgs e)
         {
-            _processor.ComputeDuplicate();
+            ToggleBtnEnable(false);
+            try
+            {
+                _processor.ComputeDuplicate();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("Error:" + ex.Message);
+                ToggleBtnEnable(true);
+            }
+
         }
 
         public void ToCompareComptationFinished(int count)
         {
             Dispatcher.BeginInvoke(new Action(() => {
                 indexedFilesCounter.Content = "Nb de fichiers en référence: " + count;
+                ToggleBtnEnable(true);
+            }));
+        }
+
+        private void CleanDuplicate_Click(object sender, RoutedEventArgs e)
+        {
+            ToggleBtnEnable(false);
+            try
+            {
+                _processor.CleanDuplicate();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("Error:" + ex.Message);
+                ToggleBtnEnable(true);
+            }
+        }
+
+        public void ToCleanFinished(int count)
+        {
+            Dispatcher.BeginInvoke(new Action(() => {
+                indexedFilesCounter.Content = "Nb de fichiers supprimés: " + count;
+                ToggleBtnEnable(true);
             }));
         }
     }

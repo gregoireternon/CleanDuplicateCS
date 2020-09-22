@@ -93,6 +93,32 @@ namespace CleanDuplicateFiles
 
         }
 
+        internal void CleanDuplicate()
+        {
+            if (string.IsNullOrEmpty(RefPath) || !Directory.Exists(RefPath))
+            {
+                throw new Exception("Vous devez choisir un répertoire de base (cible)");
+            }
+            if (string.IsNullOrEmpty(ToComparePath) || !Directory.Exists(ToComparePath))
+            {
+                throw new Exception("Vous devez choisir un répertoire à comparer");
+            }
+            if (locked) { throw new Exception("Already locked"); }
+            locked = true;
+            Dictionary<string, string> files = new Dictionary<string, string>();
+            CollectToCompareHashes(ToComparePath, files);
+            locked = false;
+
+            files = files.Where(a => _fileHashes.Contains(a.Value)).ToDictionary(a => a.Key, b => b.Value);
+
+            foreach(var f in files)
+            {
+                File.Delete(f.Key);
+            }
+
+            _observer.ToCleanFinished(files.Count);
+        }
+
         private void CollectToCompareHashes(string toComparePath, Dictionary<string, string> files)
         {
             Console.WriteLine("processing folder: " + toComparePath);
