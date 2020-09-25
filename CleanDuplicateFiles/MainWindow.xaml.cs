@@ -11,12 +11,13 @@ namespace CleanDuplicateFiles
     /// </summary>
     public partial class MainWindow : Window, IProcessObserver
     {
-
+        private static readonly NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
         Processor _processor;
         
 
         public MainWindow()
         {
+            _log.Info("create Main window");
             InitializeComponent();
             _processor = new Processor(this);
             RefFolderUrl.Text = _processor.RefPath;

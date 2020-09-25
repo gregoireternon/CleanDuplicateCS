@@ -9,6 +9,7 @@ namespace CleanDuplicateFiles
 {
     public class Processor
     {
+        private static readonly NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
         public string RefPath { get; set; }
         public string ToComparePath { get; set; }
 
@@ -21,6 +22,7 @@ namespace CleanDuplicateFiles
 
         public Processor(IProcessObserver observer)
         {
+            _log.Info("Create Processor");
             _observer = observer;
             if (File.Exists(BACKUPFILE_LOCATION))
             {
@@ -47,7 +49,7 @@ namespace CleanDuplicateFiles
 
         private void ProcessFolder(string path, HashSet<string> fHashes, Action<int> observerMethod)
         {
-            Console.WriteLine("processing folder: " + path);
+            _log.Info("processing folder: " + path);
             string[] currentPAthFiles = Directory.GetFiles(path);
             foreach (string f in currentPAthFiles)
             {
@@ -57,7 +59,7 @@ namespace CleanDuplicateFiles
                     {
                         string b64Res = Convert.ToBase64String(md5.ComputeHash(stream));
                         fHashes.Add(b64Res);
-                        Console.WriteLine(f + ":" + b64Res);
+                        _log.Info(f + ":" + b64Res);
                     }
                 }
             }
@@ -121,7 +123,7 @@ namespace CleanDuplicateFiles
 
         private void CollectToCompareHashes(string toComparePath, Dictionary<string, string> files)
         {
-            Console.WriteLine("processing folder: " + toComparePath);
+            _log.Info("processing folder: " + toComparePath);
             string[] currentPAthFiles = Directory.GetFiles(toComparePath);
             foreach (string f in currentPAthFiles)
             {
@@ -131,7 +133,7 @@ namespace CleanDuplicateFiles
                     {
                         string b64Res = Convert.ToBase64String(md5.ComputeHash(stream));
                         files.Add(f, b64Res);
-                        Console.WriteLine(f + ":" + b64Res);
+                        _log.Info(f + ":" + b64Res);
                     }
                 }
             }
