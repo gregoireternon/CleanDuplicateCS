@@ -16,7 +16,7 @@ namespace CleanDuplicateFiles
         public const string BACKUPFILE_LOCATION = "backup.data";
 
 
-        HashSet<string> _fileHashes = null;
+        Dictionary<string, List<string>> _fileHashes = null;
         bool locked = false;
         IProcessObserver _observer;
 
@@ -36,18 +36,18 @@ namespace CleanDuplicateFiles
         {
             if (locked) { throw new Exception("Already locked"); }
             locked = true;
-            _fileHashes = new HashSet<string>();
+            _fileHashes = new Dictionary<string, List<string>>();
             ProcessFolder(RefPath, _fileHashes, _observer.AdaptRefFileCount);
             File.WriteAllText(BACKUPFILE_LOCATION, JsonConvert.SerializeObject(new BackupEntity()
             {
                 RefUrl=RefPath,
                 Refs=_fileHashes
-            }));
+            },Formatting.Indented));
             locked = false;
             _observer.RefFolderPRocessed();
         }
 
-        private void ProcessFolder(string path, HashSet<string> fHashes, Action<int> observerMethod)
+        private void ProcessFolder(string path, Dictionary<string, List<string>> fHashes, Action<int, int> observerMethod)
         {
             _log.Info("processing folder: " + path);
             string[] currentPAthFiles = Directory.GetFiles(path);
@@ -58,7 +58,13 @@ namespace CleanDuplicateFiles
                     using (var stream = File.OpenRead(f))
                     {
                         string b64Res = Convert.ToBase64String(md5.ComputeHash(stream));
-                        fHashes.Add(b64Res);
+                        List<string> matchingFiles;
+                        if(!fHashes.TryGetValue(b64Res, out matchingFiles))
+                        {
+                            matchingFiles = new List<string>();
+                            fHashes.Add(b64Res, matchingFiles);
+                        }
+                        matchingFiles.Add(f);
                         _log.Info(f + ":" + b64Res);
                     }
                 }
@@ -69,7 +75,8 @@ namespace CleanDuplicateFiles
             }
             if (observerMethod != null)
             {
-                observerMethod(fHashes.Count);
+                IEnumerable<string> ll = fHashes.SelectMany(a => a.Value, (a, b) => b);
+                observerMethod(fHashes.Count, ll.Count());
             }
         }
 
@@ -89,7 +96,7 @@ namespace CleanDuplicateFiles
             CollectToCompareHashes(ToComparePath, files);
             locked = false;
 
-            files=files.Where(a => _fileHashes.Contains(a.Value)).ToDictionary(a=>a.Key,b=>b.Value);
+            files=files.Where(a => _fileHashes.ContainsKey(a.Value)).ToDictionary(a=>a.Key,b=>b.Value);
 
             _observer.ToCompareComptationFinished(files.Count);
 
@@ -111,7 +118,7 @@ namespace CleanDuplicateFiles
             CollectToCompareHashes(ToComparePath, files);
             locked = false;
 
-            files = files.Where(a => _fileHashes.Contains(a.Value)).ToDictionary(a => a.Key, b => b.Value);
+            files = files.Where(a => _fileHashes.ContainsKey(a.Value)).ToDictionary(a => a.Key, b => b.Value);
 
             foreach(var f in files)
             {

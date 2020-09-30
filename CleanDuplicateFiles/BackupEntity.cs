@@ -8,7 +8,7 @@ namespace CleanDuplicateFiles
 {
     public class BackupEntity
     {
-        public HashSet<string> Refs { get; set; }
+        public Dictionary<string, List<string>> Refs { get; set; }
 
         public string RefUrl { get; set; }
     }

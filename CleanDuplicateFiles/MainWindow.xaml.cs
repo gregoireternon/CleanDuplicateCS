@@ -54,10 +54,10 @@ namespace CleanDuplicateFiles
             
         }
 
-        public void AdaptRefFileCount(int count)
+        public void AdaptRefFileCount(int countHash, int countFile)
         {
             Dispatcher.BeginInvoke(new Action(()=> {
-                indexedFilesCounter.Content = "Nb de fichiers en référence: " + count;
+                indexedFilesCounter.Content = "Nb de hashs en référence: " + countHash + "\nnb de fichiers total:"+countFile;
             }));
             
         }
