@@ -87,7 +87,8 @@ namespace CleanDuplicateFiles
             ToggleBtnEnable(false);
             try
             {
-                _processor.ComputeDuplicate();
+                Thread t = new Thread(_processor.ComputeDuplicate);
+                t.Start();
             }
             catch (Exception ex)
             {
@@ -100,7 +101,7 @@ namespace CleanDuplicateFiles
         public void ToCompareComptationFinished(int count)
         {
             Dispatcher.BeginInvoke(new Action(() => {
-                indexedFilesCounter.Content = "Nb de fichiers en référence: " + count;
+                indexedFilesCounter.Content = "Nb de fichiers en doublon: " + count;
                 ToggleBtnEnable(true);
             }));
         }
@@ -110,7 +111,8 @@ namespace CleanDuplicateFiles
             ToggleBtnEnable(false);
             try
             {
-                _processor.CleanDuplicate();
+                Thread t = new Thread(_processor.CleanDuplicate);
+                t.Start();
             }
             catch (Exception ex)
             {
@@ -125,6 +127,39 @@ namespace CleanDuplicateFiles
                 indexedFilesCounter.Content = "Nb de fichiers supprimés: " + count;
                 ToggleBtnEnable(true);
             }));
+        }
+
+        private void ChooseRefFolder_Drop(object sender, System.Windows.DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
+                RefFolderUrl.Text = files[0];
+                _processor.RefPath = files[0];
+            }
+            _log.Debug("Drop a folder? "+ e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop));
+        }
+
+        private void ChooseRefFolder_DragEnter(object sender, System.Windows.DragEventArgs e)
+        {
+            //_log.Debug("Enter? " + e.Data);
+            //e.Effects = System.Windows.DragDropEffects.;
+        }
+
+        private void ChooseToCompare_DragEnter(object sender, System.Windows.DragEventArgs e)
+        {
+
+        }
+
+        private void ChooseToCompare_Drop(object sender, System.Windows.DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
+                ToCleanFolder.Text = files[0];
+                _processor.ToComparePath = files[0];
+            }
+            _log.Debug("Drop a folder? " + e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop));
         }
     }
 }
