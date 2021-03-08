@@ -15,6 +15,8 @@ namespace CleanDuplicateFiles
 
         public const string BACKUPFILE_LOCATION = "backup.data";
 
+        public const string CSV_FILE_LOCATION = "doublons.csv";
+
 
         Dictionary<string, List<string>> _fileHashes = null;
         bool locked = false;
@@ -43,8 +45,27 @@ namespace CleanDuplicateFiles
                 RefUrl=RefPath,
                 Refs=_fileHashes
             },Formatting.Indented));
+
+            WriteDoubleFiles(_fileHashes);
+
             locked = false;
             _observer.RefFolderPRocessed();
+        }
+
+        private void WriteDoubleFiles(Dictionary<string, List<string>> fileHashes)
+        {
+            using (StreamWriter file = new StreamWriter(CSV_FILE_LOCATION)){
+                foreach (var hash in fileHashes)
+                {
+                    if (hash.Value.Count > 1)
+                    {
+                        foreach(var vals in hash.Value)
+                        {
+                            file.WriteLine(hash.Key + ";" + vals);
+                        }
+                    }
+                }
+            }
         }
 
         private void ProcessFolder(string path, Dictionary<string, List<string>> fHashes, Action<int, int> observerMethod)
@@ -122,6 +143,7 @@ namespace CleanDuplicateFiles
 
             foreach(var f in files)
             {
+                _log.Info("removing File: " + f.Key);
                 File.Delete(f.Key);
             }
 
